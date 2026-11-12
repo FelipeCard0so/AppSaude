@@ -452,19 +452,19 @@
       <form id="formRegistro" onsubmit="salvarRegistro(event)">
         <div class="campo">
           <label>Pressão Arterial (ex: 12/8 ou 120/80)</label>
-          <input type="text" id="inputPA" placeholder="Não obrigatório">
+          <input type="text" id="inputPA" placeholder="000/00" inputmode="numeric" maxlength="6" autocomplete="off">
         </div>
         <div class="campo">
           <label>Glicemia (mg/dL)</label>
-          <input type="number" id="inputGlicose" placeholder="Ex: 95">
+          <input type="number" id="inputGlicose" placeholder="Ex: 95" inputmode="numeric">
         </div>
         <div class="campo">
           <label>Batimentos (bpm)</label>
-          <input type="number" id="inputCardio" placeholder="Ex: 72">
+          <input type="number" id="inputCardio" placeholder="Ex: 72" inputmode="numeric">
         </div>
         <div class="campo">
           <label>Oxigênio / SpO2 (%)</label>
-          <input type="number" id="inputOxi" placeholder="Ex: 98" min="60" max="100">
+          <input type="number" id="inputOxi" placeholder="Ex: 98" min="60" max="100" inputmode="numeric">
         </div>
         <button type="submit" class="btn-submit">💾 ENVIAR AGORA</button>
       </form>
@@ -542,6 +542,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=20261112-7"></script>
+  <script src="script.js?v=20261112-8"></script>
 </body>
 </html>

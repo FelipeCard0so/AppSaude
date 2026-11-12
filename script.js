@@ -18,9 +18,17 @@ const webhookGoogleScript = "https://script.google.com/macros/s/AKfycbyicwbCq833
 
 let chartInstance = null;
 
+function campoNumerico(valor) {
+  return valor !== null && valor !== undefined && String(valor).trim() !== '' && isFinite(Number(valor));
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   atualizarDashboard();
   initChart();
+  document.getElementById('inputPA').addEventListener('input', event => {
+    const numeros = event.target.value.replace(/\D/g, '').slice(0, 5);
+    event.target.value = numeros.length > 3 ? numeros.slice(0, 3) + '/' + numeros.slice(3) : numeros;
+  });
 });
 
 function abrirModalRegistro() { document.getElementById('modalRegistro').style.display = 'flex'; }
@@ -263,9 +271,9 @@ function atualizarDashboard() {
 
   const atual = registros[0];
   document.getElementById('val-pa').innerText = atual.pressao || "--";
-  document.getElementById('val-glicose').innerHTML = `${Number.isFinite(Number(atual.glicose)) ? atual.glicose : '--'} <small style="font-size:12px">mg/dL</small>`;
-  document.getElementById('val-cardio').innerHTML = `${Number.isFinite(Number(atual.cardio)) ? atual.cardio : '--'} <small style="font-size:12px">bpm</small>`;
-  document.getElementById('val-oxi').innerHTML = `${Number.isFinite(Number(atual.oxigenio)) ? atual.oxigenio : '--'} <small style="font-size:12px">%</small>`;
+  document.getElementById('val-glicose').innerHTML = `${campoNumerico(atual.glicose) ? atual.glicose : '--'} <small style="font-size:12px">mg/dL</small>`;
+  document.getElementById('val-cardio').innerHTML = `${campoNumerico(atual.cardio) ? atual.cardio : '--'} <small style="font-size:12px">bpm</small>`;
+  document.getElementById('val-oxi').innerHTML = `${campoNumerico(atual.oxigenio) ? atual.oxigenio : '--'} <small style="font-size:12px">%</small>`;
 
   const partesPA = String(atual.pressao || '').match(/\d+/g);
   const sistolica = partesPA && partesPA.length >= 2 ? (Number(partesPA[0]) <= 20 ? Number(partesPA[0]) * 10 : Number(partesPA[0])) : null;
@@ -296,9 +304,9 @@ function preencherTabela7() {
     corpo.innerHTML += `
       <tr>
         <td><strong>${r.pressao || '-'}</strong></td>
-        <td>${Number.isFinite(Number(r.glicose)) ? r.glicose : '-'}</td>
-        <td>${Number.isFinite(Number(r.cardio)) ? r.cardio : '-'}</td>
-        <td>${Number.isFinite(Number(r.oxigenio)) ? r.oxigenio + '%' : '-'}</td>
+        <td>${campoNumerico(r.glicose) ? r.glicose : '-'}</td>
+        <td>${campoNumerico(r.cardio) ? r.cardio : '-'}</td>
+        <td>${campoNumerico(r.oxigenio) ? r.oxigenio + '%' : '-'}</td>
         <td style="font-size:11px;">${r.dataHora}</td>
         <td>
           <button class="btn-excluir" onclick="excluirRegistro('${r.id}')">🗑️</button>
