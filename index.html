@@ -218,7 +218,10 @@
     }
 
     #modalMes { align-items: stretch; }
-    #modalMes .modal-content { max-width: none; height: 100%; max-height: 100vh; border-radius: 0; padding: 20px; }
+    #modalMes { overflow-x: hidden; }
+    #modalMes .modal-content { width: 100%; max-width: 100%; min-width: 0; height: 100%; max-height: 100vh; border-radius: 0; padding: 20px; overflow-x: hidden; }
+    #modalMes .campo, #modalMes .campo input { width: 100%; min-width: 0; max-width: 100%; }
+    #mesAno { display: block; box-sizing: border-box; -webkit-appearance: none; appearance: none; }
     .mensal-resumo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
     .mensal-card { background: #fff; border: 2px solid var(--cor-suave); border-radius: 18px; padding: 16px; box-shadow: 0 4px 12px rgba(62,50,57,.07); }
     .mensal-card h4 { font-size: 14px; color: var(--cor-secundaria); margin-bottom: 8px; }
