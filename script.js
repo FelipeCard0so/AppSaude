@@ -14,7 +14,7 @@ registros = registros.map((r, index) => {
 localStorage.setItem('saude_registros', JSON.stringify(registros));
 
 // ✅ SEU LINK DO GOOGLE APPS SCRIPT DIRETO NA VARIÁVEL:
-const webhookGoogleScript = "https://script.google.com/macros/s/AKfycbwlliEj-vGmJEX2dmpS_vRqbzsfJ5-xrh5tx8WVlk_tCdHAOeL0-hfv3mjRbhV9Fxqp/exec";
+const webhookGoogleScript = "https://script.google.com/macros/s/AKfycbyicwbCq833fd9jlOk-pthzbn6ESYNsniWQLJaxx6qiGMcJwozB10SREh8y70tndlMe/exec";
 
 let chartInstance = null;
 
@@ -139,15 +139,15 @@ function salvarRegistro(e) {
   const minutos = String(agora.getMinutes()).padStart(2, '0');
   const dataHoraFormatada = `${dia}/${mes}/${ano} às ${horas}:${minutos}`;
 
-  const avaliacao = avaliarMedicoes(pa, glic, car, oxi);
   const idUnico = "reg_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+  const avaliacao = avaliarMedicoes(pa, glic, car, oxi);
 
   const novoDado = {
     id: idUnico,
     pressao: pa,
-    glicose: glic,
-    cardio: car,
-    oxigenio: oxi,
+    glicose: isNaN(glic) ? null : glic,
+    cardio: isNaN(car) ? null : car,
+    oxigenio: isNaN(oxi) ? null : oxi,
     dataHora: dataHoraFormatada,
     ruim: avaliacao.ruim,
     motivo: avaliacao.motivos
@@ -170,6 +170,7 @@ function salvarRegistro(e) {
 
   // ✅ DISPARO OFICIAL PARA O GOOGLE APPS SCRIPT
   const dadosEnvio = {
+    id: idUnico,
     dataHora: dataHoraFormatada,
     pressao: pa || "-",
     glicose: isNaN(glic) ? '' : glic,
@@ -228,7 +229,6 @@ function excluirRegistro(idParaRemover) {
     localStorage.setItem('saude_ruins', JSON.stringify(registrosRuins));
   }
 
-  const chartRev = '20261112-5';
 
   preencherTabela7();
   atualizarDashboard();
