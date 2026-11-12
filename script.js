@@ -89,26 +89,26 @@ function avaliarMedicoes(paStr, glic, car, oxi) {
     }
   }
 
-  if (glic <= 55 || glic >= 250) {
+  if (!isNaN(glic) && (glic <= 55 || glic >= 250)) {
     ruim = true; criticoSevero = true;
     motivos.push(`Glicemia crítica (${glic})`);
-  } else if (glic < 70 || glic >= 140) {
+  } else if (!isNaN(glic) && (glic < 70 || glic >= 140)) {
     ruim = true;
     motivos.push(`Glicemia alterada (${glic})`);
   }
 
-  if (car < 48 || car > 120) {
+  if (!isNaN(car) && (car < 48 || car > 120)) {
     ruim = true; criticoSevero = true;
     motivos.push(`Cardio crítico (${car} bpm)`);
-  } else if (car < 55 || car > 100) {
+  } else if (!isNaN(car) && (car < 55 || car > 100)) {
     ruim = true;
     motivos.push(`Cardio alterado (${car} bpm)`);
   }
 
-  if (oxi <= 89) {
+  if (!isNaN(oxi) && oxi <= 89) {
     ruim = true; criticoSevero = true;
     motivos.push(`Oxigênio crítico (${oxi}%)`);
-  } else if (oxi < 93) {
+  } else if (!isNaN(oxi) && oxi < 93) {
     ruim = true;
     motivos.push(`Oxigênio baixo (${oxi}%)`);
   }
@@ -263,9 +263,9 @@ function atualizarDashboard() {
 
   const atual = registros[0];
   document.getElementById('val-pa').innerText = atual.pressao || "--";
-  document.getElementById('val-glicose').innerHTML = `${atual.glicose} <small style="font-size:12px">mg/dL</small>`;
-  document.getElementById('val-cardio').innerHTML = `${atual.cardio} <small style="font-size:12px">bpm</small>`;
-  document.getElementById('val-oxi').innerHTML = `${atual.oxigenio} <small style="font-size:12px">%</small>`;
+  document.getElementById('val-glicose').innerHTML = `${Number.isFinite(Number(atual.glicose)) ? atual.glicose : '--'} <small style="font-size:12px">mg/dL</small>`;
+  document.getElementById('val-cardio').innerHTML = `${Number.isFinite(Number(atual.cardio)) ? atual.cardio : '--'} <small style="font-size:12px">bpm</small>`;
+  document.getElementById('val-oxi').innerHTML = `${Number.isFinite(Number(atual.oxigenio)) ? atual.oxigenio : '--'} <small style="font-size:12px">%</small>`;
 
   const partesPA = String(atual.pressao || '').match(/\d+/g);
   const sistolica = partesPA && partesPA.length >= 2 ? (Number(partesPA[0]) <= 20 ? Number(partesPA[0]) * 10 : Number(partesPA[0])) : null;
@@ -296,9 +296,9 @@ function preencherTabela7() {
     corpo.innerHTML += `
       <tr>
         <td><strong>${r.pressao || '-'}</strong></td>
-        <td>${r.glicose}</td>
-        <td>${r.cardio}</td>
-        <td>${r.oxigenio}%</td>
+        <td>${Number.isFinite(Number(r.glicose)) ? r.glicose : '-'}</td>
+        <td>${Number.isFinite(Number(r.cardio)) ? r.cardio : '-'}</td>
+        <td>${Number.isFinite(Number(r.oxigenio)) ? r.oxigenio + '%' : '-'}</td>
         <td style="font-size:11px;">${r.dataHora}</td>
         <td>
           <button class="btn-excluir" onclick="excluirRegistro('${r.id}')">🗑️</button>
