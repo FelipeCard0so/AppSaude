@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Monitor de Saúde</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --cor-fundo: #F7EFE7;
+      --cor-card: #FFFFFF;
+      --cor-suave: #E8D2C4;
+      --cor-borda: #C7A9A3;
+      --cor-media: #9E8189;
+      --cor-secundaria: #6B5560;
+      --cor-primaria: #3E3239;
+      --alerta-vermelho: #C62828;
+      --alerta-fundo: #FFEBEE;
+      --cor-sucesso: #2E7D32;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--cor-fundo);
+      color: var(--cor-primaria);
+      padding-bottom: 120px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background-color: #ffffff;
+      border-bottom: 2px solid var(--cor-suave);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 10px rgba(62, 50, 57, 0.05);
+    }
+
+    .btn-top {
+      background-color: var(--cor-primaria);
+      color: #fff;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-ruins {
+      background-color: var(--alerta-vermelho);
+    }
+
+    .container {
+      padding: 16px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .perfil-badge {
+      background: var(--cor-card);
+      border: 2px solid var(--cor-borda);
+      padding: 14px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .perfil-badge h2 {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--cor-primaria);
+    }
+
+    .perfil-badge p {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cor-secundaria);
+    }
+
+    /* CARDS */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: #FFFFFF;
+      border-radius: 18px;
+      padding: 14px;
+      border: 2px solid var(--cor-suave);
+      box-shadow: 0 4px 8px rgba(62, 50, 57, 0.04);
+    }
+
+    .card-titulo {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--cor-secundaria);
+      margin-bottom: 4px;
+    }
+
+    .card-valor {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--cor-primaria);
+    }
+
+    .card-status {
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .status-ok { background: #E8F5E9; color: var(--cor-sucesso); }
+    .status-ruim { background: #FFCDD2; color: var(--alerta-vermelho); }
+
+    /* GRÁFICO */
+    .grafico-card {
+      background: #FFFFFF;
+      border-radius: 20px;
+      padding: 16px;
+      border: 2px solid var(--cor-borda);
+      margin-bottom: 14px;
+    }
+
+    .grafico-cabecalho {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .grafico-cabecalho h3 {
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .contador-alteracoes {
+      background: var(--cor-suave);
+      padding: 12px;
+      border-radius: 14px;
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    /* BOTÃO REGISTRAR FIXO */
+    .btn-fixo-area {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 14px 16px 20px;
+      background: linear-gradient(180deg, rgba(247, 239, 231, 0) 0%, rgba(247, 239, 231, 1) 40%);
+      z-index: 90;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .btn-registrar {
+      width: 100%;
+      background-color: var(--cor-primaria);
+      color: #FFFFFF;
+      border: none;
+      padding: 18px;
+      border-radius: 20px;
+      font-size: 19px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(62, 50, 57, 0.35);
+    }
+
+    /* MODAIS */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(62, 50, 57, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+      z-index: 200;
+    }
+
+    .modal-content {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 24px 24px 0 0;
+      padding: 22px 18px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .modal-header h3 {
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .btn-fechar {
+      background: var(--cor-suave);
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .campo {
+      margin-bottom: 14px;
+    }
+
+    .campo label {
+      display: block;
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .campo input {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      font-weight: 800;
+      border: 2px solid var(--cor-borda);
+      border-radius: 12px;
+      background: var(--cor-fundo);
+      outline: none;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--cor-primaria);
+      color: #fff;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 900;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* TABELA */
+    .tabela-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    th {
+      background: var(--cor-suave);
+      padding: 10px 4px;
+      font-weight: 900;
+      border: 1px solid var(--cor-borda);
+    }
+
+    td {
+      padding: 10px 4px;
+      border: 1px solid var(--cor-suave);
+    }
+
+    .btn-excluir {
+      background: #FFCDD2;
+      color: var(--alerta-vermelho);
+      border: none;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    /* POPUP ALERTA */
+    .alerta-popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(198, 40, 40, 0.95);
+      z-index: 300;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .alerta-caixa {
+      background: #FFFFFF;
+      border-radius: 20px;
+      padding: 22px;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .btn-emergencia {
+      background: var(--alerta-vermelho);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 900;
+      padding: 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      display: block;
+      margin: 15px 0 10px;
+    }
+
+    .config-link {
+      text-align: center;
+      font-size: 12px;
+      color: var(--cor-media);
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPO -->
+  <header class="top-bar">
+    <button class="btn-top btn-ruins" onclick="abrirModalRuins()">⚠️ 7 Alertas</button>
+    <button class="btn-top" onclick="abrirModal7()">📋 7 Últimos</button>
+  </header>
+
+  <main class="container">
+    <div class="perfil-badge">
+      <div>
+        <h2>Sra. Marcia Ap Cardoso (Dez/1959)</h2>
+        <p>Monitoramento Diário de Saúde</p>
+      </div>
+      <span style="font-size: 26px;">❤️</span>
+    </div>
+
+    <!-- CARDS DE VALORES -->
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-titulo">Pressão Arterial</div>
+        <div class="card-valor" id="val-pa">--/--</div>
+        <div class="card-status status-ok" id="st-pa">Aguardando</div>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Glicemia</div>
+        <div class="card-valor" id="val-glicose">-- <small style="font-size:12px">mg/dL</small></div>
+        <div class="card-status status-ok" id="st-glicose">Aguardando</div>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Batimentos</div>
+        <div class="card-valor" id="val-cardio">-- <small style="font-size:12px">bpm</small></div>
+        <div class="card-status status-ok" id="st-cardio">Aguardando</div>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Oximetria</div>
+        <div class="card-valor" id="val-oxi">-- <small style="font-size:12px">%</small></div>
+        <div class="card-status status-ok" id="st-oxi">Aguardando</div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO -->
+    <div class="grafico-card">
+      <div class="grafico-cabecalho">
+        <h3>Evolução Recente</h3>
+        <span style="font-size: 11px; font-weight:800; color:var(--alerta-vermelho);">🔴 = Ponto Ruim</span>
+      </div>
+      <canvas id="graficoSemana" height="220"></canvas>
+      <div class="contador-alteracoes" id="resumoAlteracoes">
+        Nenhum registro até o momento.
+      </div>
+    </div>
+
+    <div class="config-link" onclick="configurarUrls()">
+      ⚙️ Configurar Webhook do Google Apps Script
+    </div>
+  </main>
+
+  <!-- BOTÃO FIXO INFERIOR -->
+  <div class="btn-fixo-area">
+    <button class="btn-registrar" onclick="abrirModalRegistro()">
+      ➕ REGISTRAR MEDIÇÃO
+    </button>
+  </div>
+
+  <!-- MODAL REGISTRO -->
+  <div class="modal-overlay" id="modalRegistro">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Nova Medição</h3>
+        <button class="btn-fechar" onclick="fecharModal('modalRegistro')">✕</button>
+      </div>
+
+      <form id="formRegistro" onsubmit="salvarRegistro(event)">
+        <div class="campo">
+          <label>Pressão Arterial (ex: 12/8 ou 120/80)</label>
+          <input type="text" id="inputPA" placeholder="Não obrigatório">
+        </div>
+        <div class="campo">
+          <label>Glicemia (mg/dL)</label>
+          <input type="number" id="inputGlicose" placeholder="Ex: 95" required>
+        </div>
+        <div class="campo">
+          <label>Batimentos (bpm)</label>
+          <input type="number" id="inputCardio" placeholder="Ex: 72" required>
+        </div>
+        <div class="campo">
+          <label>Oxigênio / SpO2 (%)</label>
+          <input type="number" id="inputOxi" placeholder="Ex: 98" min="60" max="100" required>
+        </div>
+        <button type="submit" class="btn-submit">💾 ENVIAR AGORA</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 7 ÚLTIMOS -->
+  <div class="modal-overlay" id="modal7">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Últimos 7 Registros</h3>
+        <button class="btn-fechar" onclick="fecharModal('modal7')">✕</button>
+      </div>
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>PA</th>
+              <th>Glic.</th>
+              <th>Card.</th>
+              <th>Oxi</th>
+              <th>Data e Hora</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaCorpo7"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RUINS -->
+  <div class="modal-overlay" id="modalRuins">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="color:var(--alerta-vermelho)">⚠️ 7 Alertas Críticos</h3>
+        <button class="btn-fechar" onclick="fecharModal('modalRuins')">✕</button>
+      </div>
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>Motivo do Alerta</th>
+              <th>Valores</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaCorpoRuins"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP ALERTA VERMELHO -->
+  <div class="alerta-popup" id="popupAlerta">
+    <div class="alerta-caixa">
+      <h2 style="color:var(--alerta-vermelho)">🚨 ALERTA MÉDICO</h2>
+      <p id="msgAlertaCritico" style="margin-top:10px; font-weight:800; font-size:15px;"></p>
+      <a href="tel:192" class="btn-emergencia">📞 Ligar para SAMU (192)</a>
+      <button class="btn-fechar" style="width:100%; border-radius:12px; margin-top:8px;" onclick="fecharModal('popupAlerta')">Entendi</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
