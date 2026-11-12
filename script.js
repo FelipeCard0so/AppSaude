@@ -58,9 +58,9 @@ function carregarResumoMensal() {
 function mostrarResumoMensal(dados) {
   const nomeMes = new Date(Number(dados.ano), Number(dados.mes) - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   const area = document.getElementById('resumoMensal');
-  if (!dados.total) { area.innerHTML = `<strong>${nomeMes}</strong><br>Nenhuma medição encontrada neste mês.`; return; }
-  const linha = (rotulo, item, unidade) => item ? `<p><strong>${rotulo}:</strong> média ${item.media}${unidade}; menor ${item.min}${unidade}; maior ${item.max}${unidade} (${item.quantidade} registros)</p>` : '';
-  area.innerHTML = `<strong>${nomeMes}</strong><p>Você registrou medições em <strong>${dados.dias} dias</strong>, com <strong>${dados.total} registros</strong>.</p><p><strong>${dados.alertas}</strong> registro(s) tiveram algum resultado fora dos limites de atenção.</p>${linha('Glicemia', dados.glicose, ' mg/dL')}${linha('Batimentos', dados.cardio, ' bpm')}${linha('Oximetria', dados.oxigenio, '%')}${linha('PA sistólica', dados.sistolica, ' mmHg')}${linha('PA diastólica', dados.diastolica, ' mmHg')}`;
+  if (!dados.total) { area.innerHTML = `<div class="mensal-card mensal-vazio"><strong>${nomeMes}</strong><p>Nenhuma medição encontrada neste mês.</p></div>`; return; }
+  const cartao = (rotulo, item, unidade, classe) => item ? `<article class="mensal-card ${classe || ''}"><h4>${rotulo}</h4><strong>${item.media}${unidade}</strong><p>Média do mês</p><p>Menor: ${item.min}${unidade}<br>Maior: ${item.max}${unidade}<br>${item.quantidade} medições</p></article>` : '';
+  area.innerHTML = `<article class="mensal-card destaque"><h4>${nomeMes}</h4><strong>${dados.dias} dias</strong><p>com registros<br>${dados.total} medições no total</p></article><article class="mensal-card ${dados.alertas ? 'alerta' : ''}"><h4>Resultados que pedem atenção</h4><strong>${dados.alertas}</strong><p>${dados.alertas === 1 ? 'medição fora dos limites' : 'medições fora dos limites'}</p></article>${cartao('Glicemia', dados.glicose, ' mg/dL')}${cartao('Batimentos', dados.cardio, ' bpm')}${cartao('Oximetria', dados.oxigenio, '%')}${cartao('PA sistólica', dados.sistolica, ' mmHg')}${cartao('PA diastólica', dados.diastolica, ' mmHg')}`;
 }
 
 // ==========================================
