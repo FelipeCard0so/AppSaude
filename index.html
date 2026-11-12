@@ -49,6 +49,7 @@
       top: 0;
       z-index: 100;
       box-shadow: 0 4px 10px rgba(62, 50, 57, 0.05);
+      gap: 8px;
     }
 
     .btn-top {
@@ -60,6 +61,11 @@
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 9px 7px;
+      font-size: clamp(10px, 2.8vw, 13px);
+      white-space: nowrap;
     }
 
     .btn-ruins {
@@ -188,13 +194,15 @@
       background-color: var(--cor-primaria);
       color: #FFFFFF;
       border: none;
-      padding: 18px;
+      padding: 14px;
       border-radius: 20px;
-      font-size: 19px;
+      font-size: 17px;
       font-weight: 900;
       cursor: pointer;
       box-shadow: 0 6px 18px rgba(62, 50, 57, 0.35);
     }
+
+    @media (max-width: 390px) { .top-bar { padding: 10px 8px; gap: 5px; } .btn-top { padding: 8px 4px; letter-spacing: -.3px; } }
 
     /* MODAIS */
     .modal-overlay {
@@ -448,15 +456,15 @@
         </div>
         <div class="campo">
           <label>Glicemia (mg/dL)</label>
-          <input type="number" id="inputGlicose" placeholder="Ex: 95" required>
+          <input type="number" id="inputGlicose" placeholder="Ex: 95">
         </div>
         <div class="campo">
           <label>Batimentos (bpm)</label>
-          <input type="number" id="inputCardio" placeholder="Ex: 72" required>
+          <input type="number" id="inputCardio" placeholder="Ex: 72">
         </div>
         <div class="campo">
           <label>Oxigênio / SpO2 (%)</label>
-          <input type="number" id="inputOxi" placeholder="Ex: 98" min="60" max="100" required>
+          <input type="number" id="inputOxi" placeholder="Ex: 98" min="60" max="100">
         </div>
         <button type="submit" class="btn-submit">💾 ENVIAR AGORA</button>
       </form>
@@ -534,6 +542,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=20261112-4"></script>
+  <script src="script.js?v=20261112-5"></script>
 </body>
 </html>

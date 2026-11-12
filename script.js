@@ -126,6 +126,10 @@ function salvarRegistro(e) {
   const glic = parseInt(document.getElementById('inputGlicose').value);
   const car = parseInt(document.getElementById('inputCardio').value);
   const oxi = parseInt(document.getElementById('inputOxi').value);
+  if (!pa && isNaN(glic) && isNaN(car) && isNaN(oxi)) {
+    alert('Preencha pelo menos uma medição para registrar.');
+    return;
+  }
 
   const agora = new Date();
   const dia = String(agora.getDate()).padStart(2, '0');
@@ -158,7 +162,7 @@ function salvarRegistro(e) {
       id: idUnico,
       dataHora: dataHoraFormatada,
       motivo: avaliacao.motivos,
-      valores: `PA:${pa || '-'} | G:${glic} | C:${car} | O:${oxi}%`
+    valores: `PA:${pa || '-'} | G:${isNaN(glic) ? '-' : glic} | C:${isNaN(car) ? '-' : car} | O:${isNaN(oxi) ? '-' : oxi + '%'}`
     });
     if (registrosRuins.length > 7) registrosRuins.pop();
     localStorage.setItem('saude_ruins', JSON.stringify(registrosRuins));
@@ -168,9 +172,9 @@ function salvarRegistro(e) {
   const dadosEnvio = {
     dataHora: dataHoraFormatada,
     pressao: pa || "-",
-    glicose: glic,
-    cardio: car,
-    oxigenio: oxi,
+    glicose: isNaN(glic) ? '' : glic,
+    cardio: isNaN(car) ? '' : car,
+    oxigenio: isNaN(oxi) ? '' : oxi,
     motivoRuim: avaliacao.ruim ? avaliacao.motivos : ""
   };
 
@@ -208,6 +212,10 @@ function excluirRegistro(idParaRemover) {
   const confirmar = confirm("Deseja realmente apagar esta medição digitada incorretamente?");
   if (!confirmar) return;
 
+  const apagarRemoto = document.createElement('script');
+  apagarRemoto.src = `${webhookGoogleScript}?action=excluir&id=${encodeURIComponent(idParaRemover)}&callback=confirmarExclusaoRemota&_=${Date.now()}`;
+  document.body.appendChild(apagarRemoto);
+
   const indexReg = registros.findIndex(item => String(item.id) === String(idParaRemover));
   if (indexReg !== -1) {
     registros.splice(indexReg, 1);
@@ -219,6 +227,8 @@ function excluirRegistro(idParaRemover) {
     registrosRuins.splice(indexRuim, 1);
     localStorage.setItem('saude_ruins', JSON.stringify(registrosRuins));
   }
+
+  const chartRev = '20261112-5';
 
   preencherTabela7();
   atualizarDashboard();
