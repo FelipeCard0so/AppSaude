@@ -66,6 +66,8 @@
       background-color: var(--alerta-vermelho);
     }
 
+    .btn-mes { background-color: var(--cor-secundaria); }
+
     .container {
       padding: 16px;
       max-width: 500px;
@@ -354,7 +356,8 @@
 
   <!-- TOPO -->
   <header class="top-bar">
-    <button class="btn-top btn-ruins" onclick="abrirModalRuins()">⚠️ 7 Alertas</button>
+    <button class="btn-top btn-ruins" onclick="abrirModalRuins()">⚠️ Alertas</button>
+    <button class="btn-top btn-mes" onclick="abrirModalMes()">📅 Como foi o meu Mês?</button>
     <button class="btn-top" onclick="abrirModal7()">📋 7 Últimos</button>
   </header>
 
@@ -474,7 +477,7 @@
   <div class="modal-overlay" id="modalRuins">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 style="color:var(--alerta-vermelho)">⚠️ 7 Alertas Críticos</h3>
+        <h3 style="color:var(--alerta-vermelho)">⚠️ Últimos 7 Alertas Críticos</h3>
         <button class="btn-fechar" onclick="fecharModal('modalRuins')">✕</button>
       </div>
       <div class="tabela-wrap">
@@ -492,6 +495,20 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modalMes">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Como foi o meu mês?</h3>
+        <button class="btn-fechar" onclick="fecharModal('modalMes')">✕</button>
+      </div>
+      <div class="campo">
+        <label for="mesAno">Escolha o mês e o ano</label>
+        <input type="month" id="mesAno" min="2026-08" onchange="carregarResumoMensal()">
+      </div>
+      <div id="resumoMensal" class="contador-alteracoes">Escolha um mês para ver seu panorama.</div>
+    </div>
+  </div>
+
   <!-- POPUP ALERTA VERMELHO -->
   <div class="alerta-popup" id="popupAlerta">
     <div class="alerta-caixa">
@@ -502,6 +519,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=20261112-3"></script>
+  <script src="script.js?v=20261112-4"></script>
 </body>
 </html>

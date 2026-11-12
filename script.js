@@ -14,7 +14,7 @@ registros = registros.map((r, index) => {
 localStorage.setItem('saude_registros', JSON.stringify(registros));
 
 // ✅ SEU LINK DO GOOGLE APPS SCRIPT DIRETO NA VARIÁVEL:
-const webhookGoogleScript = "https://script.google.com/macros/s/AKfycbxIvtYrFAYWxWUgSCzU4KH9pO4Q2oyBpufuYlK7YkFXrA4QF2w70g49bLst9yKhCtMV/exec";
+const webhookGoogleScript = "https://script.google.com/macros/s/AKfycbwlliEj-vGmJEX2dmpS_vRqbzsfJ5-xrh5tx8WVlk_tCdHAOeL0-hfv3mjRbhV9Fxqp/exec";
 
 let chartInstance = null;
 
@@ -27,6 +27,41 @@ function abrirModalRegistro() { document.getElementById('modalRegistro').style.d
 function abrirModal7() { preencherTabela7(); document.getElementById('modal7').style.display = 'flex'; }
 function abrirModalRuins() { preencherTabelaRuins(); document.getElementById('modalRuins').style.display = 'flex'; }
 function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+function abrirModalMes() {
+  const agora = new Date();
+  const mesAtual = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}`;
+  const seletor = document.getElementById('mesAno');
+  seletor.max = mesAtual;
+  seletor.value = mesAtual < '2026-08' ? '2026-08' : mesAtual;
+  document.getElementById('modalMes').style.display = 'flex';
+  carregarResumoMensal();
+}
+function carregarResumoMensal() {
+  const selecionado = document.getElementById('mesAno').value;
+  const area = document.getElementById('resumoMensal');
+  if (!selecionado) return;
+  area.innerText = 'Buscando suas medições na planilha…';
+  const callback = 'receberResumoMensal';
+  window[callback] = dados => {
+    delete window[callback];
+    const script = document.getElementById('consultaMensal');
+    if (script) script.remove();
+    if (!dados || dados.erro) { area.innerText = 'Não foi possível carregar o resumo. Tente novamente.'; return; }
+    mostrarResumoMensal(dados);
+  };
+  const script = document.createElement('script');
+  script.id = 'consultaMensal';
+  script.src = `${webhookGoogleScript}?action=mensal&mes=${selecionado}&callback=${callback}&_=${Date.now()}`;
+  script.onerror = () => { area.innerText = 'Falha ao acessar a planilha. Verifique a implantação do Apps Script.'; script.remove(); };
+  document.body.appendChild(script);
+}
+function mostrarResumoMensal(dados) {
+  const nomeMes = new Date(Number(dados.ano), Number(dados.mes) - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  const area = document.getElementById('resumoMensal');
+  if (!dados.total) { area.innerHTML = `<strong>${nomeMes}</strong><br>Nenhuma medição encontrada neste mês.`; return; }
+  const linha = (rotulo, item, unidade) => item ? `<p><strong>${rotulo}:</strong> média ${item.media}${unidade}; menor ${item.min}${unidade}; maior ${item.max}${unidade} (${item.quantidade} registros)</p>` : '';
+  area.innerHTML = `<strong>${nomeMes}</strong><p>Você registrou medições em <strong>${dados.dias} dias</strong>, com <strong>${dados.total} registros</strong>.</p><p><strong>${dados.alertas}</strong> registro(s) tiveram algum resultado fora dos limites de atenção.</p>${linha('Glicemia', dados.glicose, ' mg/dL')}${linha('Batimentos', dados.cardio, ' bpm')}${linha('Oximetria', dados.oxigenio, '%')}${linha('PA sistólica', dados.sistolica, ' mmHg')}${linha('PA diastólica', dados.diastolica, ' mmHg')}`;
+}
 
 // ==========================================
 // AVALIAÇÃO CLÍNICA
