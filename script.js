@@ -336,12 +336,12 @@ function initChart() {
     options: {
       responsive: true,
       plugins: {
-        legend: { position: 'bottom', labels: { font: { weight: 'bold' }, color: '#3E3239', usePointStyle: true, boxWidth: 10 } },
+        legend: { position: 'bottom', labels: { font: { weight: 'bold' }, color: '#3E3239', usePointStyle: true, useBorderRadius: true, boxWidth: 12, generateLabels(chart) { return Chart.defaults.plugins.legend.labels.generateLabels(chart).map((item, i) => ({ ...item, fillStyle: cores[Object.keys(cores)[i]], strokeStyle: cores[Object.keys(cores)[i]], lineWidth: 0 })); } } },
         tooltip: { callbacks: { label: item => `${item.dataset.label}: ${item.parsed.y ?? 'Sem medição'}` } }
       },
       scales: {
-        y: { position: 'left', title: { display: true, text: 'Glicemia / bpm' }, ticks: { font: { weight: 'bold' }, color: '#6B5560' } },
-        yPa: { position: 'right', title: { display: true, text: 'PA (mmHg)' }, grid: { drawOnChartArea: false }, ticks: { font: { weight: 'bold' }, color: '#6B5560' } },
+        y: { position: 'left', beginAtZero: false, suggestedMin: 50, suggestedMax: 150, title: { display: true, text: 'Glicemia / bpm' }, ticks: { font: { weight: 'bold' }, color: '#6B5560' } },
+        yPa: { position: 'right', beginAtZero: false, suggestedMin: 50, suggestedMax: 180, title: { display: true, text: 'PA (mmHg)' }, grid: { drawOnChartArea: false }, ticks: { font: { weight: 'bold' }, color: '#6B5560' } },
         x: { ticks: { font: { weight: 'bold' }, color: '#6B5560' } }
       }
     }
