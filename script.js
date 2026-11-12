@@ -223,8 +223,8 @@ function atualizarDashboard() {
   document.getElementById('val-oxi').innerHTML = `${atual.oxigenio} <small style="font-size:12px">%</small>`;
 
   const partesPA = String(atual.pressao || '').match(/\d+/g);
-  const sistolica = partesPA?.length >= 2 ? (Number(partesPA[0]) <= 20 ? Number(partesPA[0]) * 10 : Number(partesPA[0])) : null;
-  const diastolica = partesPA?.length >= 2 ? (Number(partesPA[1]) <= 20 ? Number(partesPA[1]) * 10 : Number(partesPA[1])) : null;
+  const sistolica = partesPA && partesPA.length >= 2 ? (Number(partesPA[0]) <= 20 ? Number(partesPA[0]) * 10 : Number(partesPA[0])) : null;
+  const diastolica = partesPA && partesPA.length >= 2 ? (Number(partesPA[1]) <= 20 ? Number(partesPA[1]) * 10 : Number(partesPA[1])) : null;
   definirStatus('st-pa', sistolica, () => sistolica !== null && (sistolica >= 180 || diastolica >= 110), () => sistolica !== null && (sistolica >= 140 || sistolica < 90 || diastolica >= 90));
   definirStatus('st-glicose', atual.glicose, v => v <= 55 || v >= 250, v => v < 70 || v >= 140);
   definirStatus('st-cardio', atual.cardio, v => v < 48 || v > 120, v => v < 55 || v > 100);
@@ -357,8 +357,8 @@ function initChart() {
     options: {
       responsive: true,
       plugins: {
-        legend: { position: 'bottom', labels: { font: { weight: 'bold' }, color: '#3E3239', usePointStyle: true, boxWidth: 12, generateLabels(chart) { return chart.data.datasets.map((dataset, i) => ({ text: dataset.label, fillStyle: cores[Object.keys(cores)[i]], strokeStyle: cores[Object.keys(cores)[i]], lineWidth: 0, pointStyle: 'circle', hidden: !chart.isDatasetVisible(i), datasetIndex: i })); } } },
-        tooltip: { callbacks: { label: item => `${item.dataset.label}: ${item.parsed.y ?? 'Sem medição'}` } }
+        legend: { position: 'bottom', labels: { font: { weight: 'bold' }, color: '#3E3239', usePointStyle: true, boxWidth: 12, generateLabels(chart) { return chart.data.datasets.map(function(dataset, i) { return { text: dataset.label, fillStyle: cores[Object.keys(cores)[i]], strokeStyle: cores[Object.keys(cores)[i]], lineWidth: 0, pointStyle: 'circle', hidden: !chart.isDatasetVisible(i), datasetIndex: i }; }); } } },
+        tooltip: { callbacks: { label: item => `${item.dataset.label}: ${item.parsed.y === null || item.parsed.y === undefined ? 'Sem medição' : item.parsed.y}` } }
       },
       scales: {
         y: { position: 'left', beginAtZero: false, suggestedMin: 50, suggestedMax: 150, title: { display: true, text: 'Glicemia / bpm' }, ticks: { font: { weight: 'bold' }, color: '#6B5560' } },
