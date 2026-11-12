@@ -336,7 +336,7 @@ function initChart() {
     options: {
       responsive: true,
       plugins: {
-        legend: { position: 'bottom', labels: { font: { weight: 'bold' }, color: '#3E3239', usePointStyle: true, useBorderRadius: true, boxWidth: 12, generateLabels(chart) { return Chart.defaults.plugins.legend.labels.generateLabels(chart).map((item, i) => ({ ...item, fillStyle: cores[Object.keys(cores)[i]], strokeStyle: cores[Object.keys(cores)[i]], lineWidth: 0 })); } } },
+        legend: { position: 'bottom', labels: { font: { weight: 'bold' }, color: '#3E3239', usePointStyle: true, boxWidth: 12, generateLabels(chart) { return chart.data.datasets.map((dataset, i) => ({ text: dataset.label, fillStyle: cores[Object.keys(cores)[i]], strokeStyle: cores[Object.keys(cores)[i]], lineWidth: 0, pointStyle: 'circle', hidden: !chart.isDatasetVisible(i), datasetIndex: i })); } } },
         tooltip: { callbacks: { label: item => `${item.dataset.label}: ${item.parsed.y ?? 'Sem medição'}` } }
       },
       scales: {
