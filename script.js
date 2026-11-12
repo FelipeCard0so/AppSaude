@@ -194,11 +194,24 @@ function excluirRegistro(idParaRemover) {
 // ATUALIZAÇÃO DA TELA
 // ==========================================
 function atualizarDashboard() {
+  const definirStatus = (id, valor, limiteRuim, limiteAtencao) => {
+    const el = document.getElementById(id);
+    if (valor === null || valor === undefined) {
+      el.innerText = 'Aguardando';
+      el.className = 'card-status status-ok';
+      return;
+    }
+    const estado = limiteRuim(valor) ? 'Ruim' : limiteAtencao(valor) ? 'Atenção' : 'Está ótimo';
+    el.innerText = estado;
+    el.className = `card-status ${estado === 'Ruim' ? 'status-ruim' : estado === 'Atenção' ? 'status-atencao' : 'status-ok'}`;
+  };
+
   if (registros.length === 0) {
     document.getElementById('val-pa').innerText = "--/--";
     document.getElementById('val-glicose').innerHTML = `-- <small style="font-size:12px">mg/dL</small>`;
     document.getElementById('val-cardio').innerHTML = `-- <small style="font-size:12px">bpm</small>`;
     document.getElementById('val-oxi').innerHTML = `-- <small style="font-size:12px">%</small>`;
+    ['st-pa', 'st-glicose', 'st-cardio', 'st-oxi'].forEach(id => definirStatus(id, null));
     document.getElementById('resumoAlteracoes').innerText = "Nenhum registro no momento.";
     return;
   }
@@ -208,6 +221,14 @@ function atualizarDashboard() {
   document.getElementById('val-glicose').innerHTML = `${atual.glicose} <small style="font-size:12px">mg/dL</small>`;
   document.getElementById('val-cardio').innerHTML = `${atual.cardio} <small style="font-size:12px">bpm</small>`;
   document.getElementById('val-oxi').innerHTML = `${atual.oxigenio} <small style="font-size:12px">%</small>`;
+
+  const partesPA = String(atual.pressao || '').match(/\d+/g);
+  const sistolica = partesPA?.length >= 2 ? (Number(partesPA[0]) <= 20 ? Number(partesPA[0]) * 10 : Number(partesPA[0])) : null;
+  const diastolica = partesPA?.length >= 2 ? (Number(partesPA[1]) <= 20 ? Number(partesPA[1]) * 10 : Number(partesPA[1])) : null;
+  definirStatus('st-pa', sistolica, () => sistolica !== null && (sistolica >= 180 || diastolica >= 110), () => sistolica !== null && (sistolica >= 140 || sistolica < 90 || diastolica >= 90));
+  definirStatus('st-glicose', atual.glicose, v => v <= 55 || v >= 250, v => v < 70 || v >= 140);
+  definirStatus('st-cardio', atual.cardio, v => v < 48 || v > 120, v => v < 55 || v > 100);
+  definirStatus('st-oxi', atual.oxigenio, v => v <= 89, v => v < 93);
 
   const alteracoesSemana = registros.slice(0, 14).filter(r => r.ruim).length;
   document.getElementById('resumoAlteracoes').innerHTML = `
